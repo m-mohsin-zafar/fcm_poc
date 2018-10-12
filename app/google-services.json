@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "946981631184",
+    "firebase_url": "https://fcmpoc-39939.firebaseio.com",
+    "project_id": "fcmpoc-39939",
+    "storage_bucket": "fcmpoc-39939.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:946981631184:android:4aa76f13a642870f",
+        "android_client_info": {
+          "package_name": "com.globalrescue.mzafar.fcmpoc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "946981631184-a07rshvfpqpv5o99a333b8d0pdbfh1t7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.globalrescue.mzafar.fcmpoc",
+            "certificate_hash": "ecc2d6c2290cc9e956d950ae08acc13eb5d8bd3f"
+          }
+        },
+        {
+          "client_id": "946981631184-dbsiol13m14bq8g3qji43k5ed0di0gpa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnaYogQaH7g3eD5u49wYwmOe83yKyXjXw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "946981631184-dbsiol13m14bq8g3qji43k5ed0di0gpa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
