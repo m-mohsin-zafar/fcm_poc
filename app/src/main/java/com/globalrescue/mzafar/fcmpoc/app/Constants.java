@@ -20,4 +20,9 @@ public class Constants {
 
     public static final String SHARED_PREF = "fcm_pref";
 
+    // Keys for FCM Data Messages
+    public static final String TITLE = "title";
+    public static final String MESSAGE = "message";
+    public static final String IMAGE_URL = "image-url";
+    public static final String TEST_KEY_2 = "testKey2";
 }

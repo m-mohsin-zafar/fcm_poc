@@ -2,6 +2,7 @@ package com.globalrescue.mzafar.fcmpoc.utils;
 
 import android.app.ActivityManager;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -10,10 +11,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.text.Html;
 import android.text.TextUtils;
@@ -31,14 +34,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class NotificationUtils {
+public class NotificationsManager {
 
 
-    private static String TAG = NotificationUtils.class.getSimpleName();
+    private static String TAG = NotificationsManager.class.getSimpleName();
 
     private Context mContext;
 
-    public NotificationUtils(Context mContext) {
+    private NotificationManager notificationManager;
+
+    public NotificationsManager(Context mContext) {
         this.mContext = mContext;
     }
 
@@ -53,7 +58,7 @@ public class NotificationUtils {
 
 
         // notification icon
-        final int icon = R.mipmap.ic_launcher;
+        final int icon = R.drawable.ic_app_notif;
 
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         final PendingIntent resultPendingIntent =
@@ -86,6 +91,87 @@ public class NotificationUtils {
             showSmallNotification(mBuilder, icon, title, message, timeStamp, resultPendingIntent, alarmSound);
 //            playNotificationSound();
         }
+    }
+
+    public void showSimpleNotification(final String title, final String message, final long timeStamp, Intent intent){
+        notificationManager =
+                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        //Setting up Notification channels for android O and above
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            setupChannels();
+        }
+        int notificationId = Constants.NOTIFICATION_ID;
+
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mContext, Constants.CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_app_notif)  //a resource for your custom small icon
+                .setContentTitle(title) //the "title" value you sent in your notification
+                .setContentText(message) //ditto
+                .setWhen(timeStamp)
+                .setAutoCancel(true)  //dismisses the notification on click
+                .setSound(defaultSoundUri);
+
+        if (intent != null){
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            final PendingIntent resultPendingIntent =
+                    PendingIntent.getActivity(
+                            mContext,
+                            0,
+                            intent,
+                            PendingIntent.FLAG_CANCEL_CURRENT
+                    );
+            notificationBuilder.setContentIntent(resultPendingIntent);
+        }
+
+        NotificationManager notificationManager =
+                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(notificationId /* ID of notification */, notificationBuilder.build());
+    }
+
+    public void showNotificationWithImage(final String title, final String message, final long timeStamp, Intent intent, String imageURL){
+
+        Bitmap bitmap = getBitmapFromURL(imageURL);
+
+        notificationManager =
+                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        //Setting up Notification channels for android O and above
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            setupChannels();
+        }
+        int notificationId = Constants.NOTIFICATION_ID;
+
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        NotificationCompat.BigPictureStyle bigPictureStyle = new NotificationCompat.BigPictureStyle();
+        bigPictureStyle.setBigContentTitle(title);
+        bigPictureStyle.setSummaryText(Html.fromHtml(message).toString());
+        bigPictureStyle.bigPicture(bitmap);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(mContext, Constants.CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_app_notif)  //a resource for your custom small icon
+                .setContentTitle(title) //the "title" value you sent in your notification
+                .setContentText(message) //ditto
+                .setWhen(timeStamp)
+                .setAutoCancel(true)  //dismisses the notification on click
+                .setSound(defaultSoundUri) /* We can set Large Icon also */
+                .setStyle(bigPictureStyle);
+
+        if (intent != null){
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            final PendingIntent resultPendingIntent =
+                    PendingIntent.getActivity(
+                            mContext,
+                            0,
+                            intent,
+                            PendingIntent.FLAG_CANCEL_CURRENT
+                    );
+            notificationBuilder.setContentIntent(resultPendingIntent);
+        }
+
+        NotificationManager notificationManager =
+                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(notificationId /* ID of notification */, notificationBuilder.build());
     }
 
 
@@ -154,6 +240,7 @@ public class NotificationUtils {
     }
 
     // Playing notification sound
+    // Use method if we have custom sound for the app
     public void playNotificationSound() {
         try {
             Uri alarmSound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
@@ -201,6 +288,7 @@ public class NotificationUtils {
 
     public static long getTimeMilliSec(String timeStamp) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         try {
             Date date = format.parse(timeStamp);
             return date.getTime();
@@ -209,4 +297,29 @@ public class NotificationUtils {
         }
         return 0;
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void setupChannels(){
+        CharSequence channelName = Constants.CHANNEL_NAME;
+        String channelDescription = Constants.CHANNEL_DESCRIPTION;
+
+        NotificationChannel notificationChannel;
+        notificationChannel = new NotificationChannel(Constants.CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_HIGH);
+        notificationChannel.setDescription(channelDescription);
+        notificationChannel.enableLights(true);
+        notificationChannel.setLightColor(Color.RED);
+        notificationChannel.enableVibration(true);
+        if (notificationManager != null) {
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+    }
+
+//    String timestamp = String.valueOf(remoteMessage.getSentTime());
+//    //String date  = DateFormat.getDateTimeInstance(DateFormat.MEDIUM,DateFormat.SHORT).format(remoteMessage.getSentTime());
+//    Date date = new Date(remoteMessage.getSentTime());
+//    DateFormat df = new SimpleDateFormat("dd:MM:yy:HH:mm:ss");
+//    df.pa
+//SimpleDateFormat format = new SimpleDateFormat();
+//format.parse(date);
+
 }

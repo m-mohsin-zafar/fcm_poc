@@ -15,9 +15,7 @@ import android.widget.Toast;
 
 import com.globalrescue.mzafar.fcmpoc.R;
 import com.globalrescue.mzafar.fcmpoc.app.Constants;
-import com.globalrescue.mzafar.fcmpoc.utils.NotificationUtils;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.FirebaseInstanceIdService;
+import com.globalrescue.mzafar.fcmpoc.utils.NotificationsManager;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 public class MainActivity extends AppCompatActivity {
@@ -93,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 new IntentFilter(Constants.PUSH_NOTIFICATION));
 
         // clear the notification area when the app is opened
-        NotificationUtils.clearNotifications(getApplicationContext());
+        NotificationsManager.clearNotifications(getApplicationContext());
     }
 
     @Override
